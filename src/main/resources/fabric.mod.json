@@ -1,0 +1,34 @@
+{
+    "schemaVersion": 1,
+    "id": "varoe",
+    "version": "${version}",
+
+    "name": "Varoe",
+    "description": "Varo",
+    "authors": [
+        "spholz"
+    ],
+
+    "contact": {
+        "sources": "https://github.com/spholz/varoe"
+    },
+
+    "license": "MIT",
+
+    "environment": "server",
+    "entrypoints": {
+        "server": [
+            "varoe.VaroeMod"
+        ]
+    },
+    "mixins": [
+        "varoe.mixins.json"
+    ],
+
+    "depends": {
+        "fabricloader": ">=0.13.3",
+        "fabric": "*",
+        "minecraft": "1.18.2",
+        "java": ">=17"
+    }
+}

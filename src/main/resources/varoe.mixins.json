@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "varoe.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "server": [
+    "ChestBlockMixin",
+    "DedicatedPlayerManagerMixin",
+    "HopperBlockEntityMixin",
+    "PlayerManagerMixin",
+    "ServerPlayerEntityMixin",
+    "ServerPlayerInteractionManagerMixin",
+    "CraftingResultInventoryMixin",
+    "PlayerInventoryMixin",
+    "BrewingStandBlockEntityMixin",
+    "PlayerManagerAccessor",
+    "WorldSaveHandlerAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
