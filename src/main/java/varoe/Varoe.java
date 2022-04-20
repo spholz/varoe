@@ -156,6 +156,8 @@ public class Varoe {
                             p.sendMessage(Text.of(String.format("Registered players not online: %s", Arrays.toString(registeredPlayersNotOnline))), false);
                     }
 
+                    LOGGER.info("Registered players not online: {}", Arrays.toString(registeredPlayersNotOnline));
+
                     return;
                 }
 
