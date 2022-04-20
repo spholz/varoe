@@ -131,14 +131,13 @@ public class Varoe {
                     // start the game
                     data.state = VaroeData.GameState.STARTED;
 
-                    // set all join times to Instant.now()
+                    // set all join times to Instant.now() and change to survival mode
                     Instant joinTime = Instant.now();
 
                     data.joinTimes.clear();
-                    for (var player : data.registeredPlayers.values())
-                        data.joinTimes.put(player.getProfile(), joinTime);
 
                     for (var player : server.getPlayerManager().getPlayerList()) {
+                        data.joinTimes.put(player.getGameProfile(), joinTime);
                         if (data.registeredPlayers.containsKey(player.getGameProfile()))
                             player.changeGameMode(GameMode.SURVIVAL);
                     }
