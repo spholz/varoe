@@ -58,6 +58,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
             networkHandler.disconnect(new LiteralText("You died.\nGame Over").formatted(Formatting.RED));
 
             Varoe.getInstance().checkForVictory();
+
+            Varoe.getInstance().saveData();
         });
     }
 
