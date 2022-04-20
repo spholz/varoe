@@ -298,7 +298,11 @@ public class Varoe {
         for (var e : Varoe.getInstance().getRegisteredPlayers().entrySet()) {
             if (e.getValue().isAlive()) {
                 var team = scoreboard.getPlayerTeam(e.getValue().getProfile().getName());
-                aliveTeams.add(team);
+
+                if (team != null)
+                    aliveTeams.add(team);
+                else
+                    LOGGER.error("Player \"{}\" is alive but has no team! All registered players must be in a team!", e.getValue().getProfile().getName());
             }
         }
 

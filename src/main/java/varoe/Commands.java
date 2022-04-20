@@ -150,6 +150,13 @@ public class Commands {
     }
 
     private int executeStart(CommandContext<ServerCommandSource> ctx) {
+        // check if there is a player without a team
+        var scoreboard = ctx.getSource().getServer().getScoreboard();
+        for (var player : varoe.getData().registeredPlayers.values()) {
+            if (scoreboard.getPlayerTeam(player.getProfile().getName()) == null)
+                ctx.getSource().sendError(Text.of("Player \"" + player.getProfile().getName() + "\" has no team! This will cause problems!"));
+        }
+
         varoe.setCountdownEnd(Instant.now().plusSeconds(IntegerArgumentType.getInteger(ctx, "countdown_time")));
 
         varoe.setGameState(VaroeData.GameState.COUNTDOWN);
