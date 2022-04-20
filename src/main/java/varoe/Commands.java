@@ -166,6 +166,9 @@ public class Commands {
         varoe.setGameState(VaroeData.GameState.NOT_STARTED);
         varoe.getData().joinTimes.clear();
 
+        for (var player : varoe.getData().registeredPlayers.values())
+            player.setAlive(true);
+
         ctx.getSource().sendFeedback(Text.of("Varo stopped"), false);
 
         varoe.saveData();
