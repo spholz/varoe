@@ -174,7 +174,7 @@ public class Varoe {
                             if (!isOpponentInRange(player, data.maxOpponentDistance))
                                 playersToDisconnect.add(player);
                             else
-                                player.sendMessage(Text.of("An opponent is nearby. You won't get get kicked currently."), true);
+                                player.sendMessage(new LiteralText("An opponent is nearby. You won't get get kicked currently.").formatted(Formatting.BLACK), true);
 
                             continue;
                         }
