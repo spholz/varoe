@@ -227,7 +227,14 @@ public class Commands {
         for (var player : varoe.getData().registeredPlayers.values()) {
             var joinTime = varoe.getData().joinTimes.get(player.getProfile());
 
-            String line = String.format(" %s: %s", player.getProfile().getName(), player.isAlive() ? "alive" : "dead");
+            String line = String.format(" %s", player.getProfile().getName());
+
+            var scoreboard = ctx.getSource().getServer().getScoreboard();
+            var team = scoreboard.getPlayerTeam(player.getProfile().getName());
+            if (team != null)
+                line += String.format(" [%s]", team.getDisplayName().asString());
+
+            line += String.format(": %s", player.isAlive() ? "alive" : "dead");
 
             // TODO check if player logged in
             if (joinTime != null) {
