@@ -24,6 +24,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,6 +142,16 @@ public class Varoe {
                         if (data.registeredPlayers.containsKey(player.getGameProfile()))
                             player.changeGameMode(GameMode.SURVIVAL);
                     }
+
+                    // set difficulty to normal
+                    server.setDifficulty(Difficulty.NORMAL, true);
+
+                    for (var p : server.getPlayerManager().getPlayerList()) {
+                        if (server.getPlayerManager().isOperator(p.getGameProfile()))
+                            p.sendMessage(Text.of("Difficulty set to normal"), false);
+                    }
+
+                    LOGGER.info("Difficulty set to normal");
 
                     server.getPlayerManager().broadcast(Text.of("Varo starts NOW!"), MessageType.SYSTEM, NIL_UUID);
 
