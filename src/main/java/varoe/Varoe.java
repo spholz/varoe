@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static net.minecraft.util.Util.NIL_UUID;
 
@@ -204,29 +205,33 @@ public class Varoe {
     }
 
     public boolean isOpponentInRange(PlayerEntity self, double range) {
-        var players = server.getPlayerManager().getPlayerList().iterator();
+        var scoreboard = server.getScoreboard();
+        var playerManager = server.getPlayerManager();
 
-        double d;
-        do {
-            PlayerEntity player;
+        final Predicate<PlayerEntity> isOfDifferentTeam = (player) -> {
+            var selfTeam = scoreboard.getPlayerTeam(self.getGameProfile().getName());
+            var otherTeam = scoreboard.getPlayerTeam(player.getGameProfile().getName());
 
-            do {
-                if (!players.hasNext())
-                    return false;
+            if (!getRegisteredPlayers().containsKey(player.getGameProfile()))
+                return false;
 
-                player = players.next();
-                if (player == self) {
-                    if (!players.hasNext())
-                        return false;
+            if (playerManager.isOperator(player.getGameProfile()))
+                return false;
 
-                    player = players.next();
-                }
-            } while(!EntityPredicates.EXCEPT_SPECTATOR.test(player) && !EntityPredicates.VALID_LIVING_ENTITY.test(player));
+            if (selfTeam == null || otherTeam == null)
+                return false;
 
-            d = player.squaredDistanceTo(self);
-        } while(!(range < 0.0D) && !(d < range * range));
+            return !selfTeam.equals(otherTeam);
+        };
 
-        return true;
+        var playersInRange = server.getPlayerManager().getPlayerList().stream()
+                .filter((player) -> !player.equals(self))
+                .filter(EntityPredicates.EXCEPT_SPECTATOR)
+                .filter(EntityPredicates.VALID_LIVING_ENTITY)
+                .filter(isOfDifferentTeam)
+                .filter((player) -> player.squaredDistanceTo(self) < range * range);
+
+        return playersInRange.findAny().isPresent();
     }
 
     private void registerCommands() {
