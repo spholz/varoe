@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -53,7 +54,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
             varoPlayer.setAlive(false);
 
             for (var p : server.getPlayerManager().getPlayerList())
-                p.playSound(ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+                world.playSound(this, p.getX(), p.getY(), p.getZ(), ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 1.0f, 1.0f);
 
             networkHandler.disconnect(new LiteralText("You died.\nGame Over").formatted(Formatting.RED));
 
