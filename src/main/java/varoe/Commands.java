@@ -191,7 +191,7 @@ public class Commands {
         GameProfile profile = gameProfiles.iterator().next();
 
         if (varoe.getData().registeredPlayers.containsKey(profile))
-            throw new SimpleCommandExceptionType(new LiteralText(String.format("\"%s\" isn't registered!", profile.getName()))).create();
+            throw new SimpleCommandExceptionType(new LiteralText(String.format("\"%s\" is already registered!", profile.getName()))).create();
 
         varoe.getData().registeredPlayers.put(profile, new VaroPlayer(profile));
         ctx.getSource().sendFeedback(Text.of(String.format("\"%s\" registered", profile.getName())), false);
