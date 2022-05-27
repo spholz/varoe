@@ -140,8 +140,11 @@ public class Varoe {
 
                     for (var player : server.getPlayerManager().getPlayerList()) {
                         data.joinTimes.put(player.getGameProfile(), joinTime);
-                        if (data.registeredPlayers.containsKey(player.getGameProfile()))
+                        if (data.registeredPlayers.containsKey(player.getGameProfile())) {
                             player.changeGameMode(GameMode.SURVIVAL);
+                            player.removeStatusEffect(StatusEffects.RESISTANCE);
+                            player.removeStatusEffect(StatusEffects.SATURATION);
+                        }
                     }
 
                     // set difficulty to normal
@@ -200,6 +203,15 @@ public class Varoe {
 
                 for (var player : playersToDisconnect)
                     player.networkHandler.disconnect(Text.of("Your time is over"));
+            } else if (data.state == VaroeData.GameState.JOINING_ALLOWED) {
+                if (server.getTicks() % 100 == 0) {
+                    for (var player : server.getPlayerManager().getPlayerList()) {
+                        if (data.registeredPlayers.containsKey(player.getGameProfile())) {
+                            player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, Integer.MAX_VALUE, 4, false, false));
+                            player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, Integer.MAX_VALUE, 1, false, false));
+                        }
+                    }
+                }
             }
         });
     }
@@ -243,6 +255,9 @@ public class Varoe {
             VaroPlayer varoPlayer = data.registeredPlayers.get(player.getGameProfile());
 
             if (data.state != VaroeData.GameState.STARTED) {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, Integer.MAX_VALUE, 4, false, false));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, Integer.MAX_VALUE, 1, false, false));
+
                 // force the player to their spawn pos
                 var spawnPos = varoPlayer.getSpawnPos();
 
@@ -252,6 +267,8 @@ public class Varoe {
                 return;
             }
 
+            player.removeStatusEffect(StatusEffects.RESISTANCE);
+            player.removeStatusEffect(StatusEffects.SATURATION);
 
             if (data.joinTimes.containsKey(player.getGameProfile())) {
                 Duration timeLeft = data.playTime.minus(Duration.between(data.joinTimes.get(player.getGameProfile()), Instant.now()));
