@@ -51,8 +51,10 @@ public abstract class ChestBlockMixin extends AbstractChestBlock<ChestBlockEntit
         if (placer instanceof ServerPlayerEntity) {
             // getStateForNeighborUpdate sets the team before onPlace gets called so only set the team if Varoe.teamChests[pos] == null
             if (Varoe.getInstance().getTeamChests().get(pos) == null) {
-                Varoe.getInstance().addTeamChest(pos, placer.getScoreboardTeam());
-                ((ServerPlayerEntity) placer).sendMessage(Text.of("Team chest created"), false);
+                if (placer.getScoreboardTeam() != null) {
+                    Varoe.getInstance().addTeamChest(pos, placer.getScoreboardTeam());
+                    ((ServerPlayerEntity) placer).sendMessage(Text.of("Team chest created"), false);
+                }
             }
         }
     }
