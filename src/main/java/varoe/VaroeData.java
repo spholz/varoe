@@ -11,6 +11,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 
 import java.io.*;
@@ -95,6 +96,19 @@ public class VaroeData {
                         public GameProfile read(JsonReader in) throws IOException {
                             var uuid = UUID.fromString(in.nextString());
                             return Varoe.getInstance().getServer().getUserCache().getByUuid(uuid).orElse(new GameProfile(uuid, null));
+                        }
+                    }.nullSafe()
+            )
+            .registerTypeAdapter(Identifier.class,
+                    new TypeAdapter<Identifier>() {
+                        @Override
+                        public void write(JsonWriter out, Identifier value) throws IOException {
+                            out.value(String.format(value.toString()));
+                        }
+
+                        @Override
+                        public Identifier read(JsonReader in) throws IOException {
+                            return new Identifier(in.nextString());
                         }
                     }.nullSafe()
             )
