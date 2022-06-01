@@ -116,6 +116,31 @@ public class VaroeData {
                         }
                     }.nullSafe()
             )
+            .registerTypeHierarchyAdapter(
+                    Vec3i.class,
+                    new TypeAdapter<Vec3i>() {
+                        @Override
+                        public void write(JsonWriter out, Vec3i value) throws IOException {
+                            out.beginArray();
+                            out.value(value.getX());
+                            out.value(value.getY());
+                            out.value(value.getZ());
+                            out.endArray();
+                            // out.value(String.format(value.toString()));
+                        }
+
+                        @Override
+                        public Vec3i read(JsonReader in) throws IOException {
+                            int x, y, z;
+                            in.beginArray();
+                            x = in.nextInt();
+                            y = in.nextInt();
+                            z = in.nextInt();
+                            in.endArray();
+                            return new Vec3i(x, y, z);
+                        }
+                    }.nullSafe()
+            )
             .excludeFieldsWithModifiers(Modifier.TRANSIENT | Modifier.STATIC)
             .enableComplexMapKeySerialization() // FIXME maybe high performance impact?
             .serializeNulls()
