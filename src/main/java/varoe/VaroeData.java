@@ -68,7 +68,11 @@ public class VaroeData {
 
                         @Override
                         public AbstractTeam read(JsonReader in) throws IOException {
-                            return Varoe.getInstance().getServer().getScoreboard().getTeam(in.nextString());
+                            var teamStr = in.nextString();
+                            var team = Varoe.getInstance().getServer().getScoreboard().getTeam(teamStr);
+                            if (team == null)
+                                throw new RuntimeException(String.format("unknown team in varoe data json: \"%s\"", teamStr));
+                            return team;
                         }
                     }.nullSafe()
             )
