@@ -24,6 +24,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import varoe.mixin.PlayerManagerAccessor;
 import varoe.mixin.WorldSaveHandlerAccessor;
@@ -221,12 +223,14 @@ public class Commands {
     }
 
     private int executeStatus(CommandContext<ServerCommandSource> ctx) {
-        ctx.getSource().sendFeedback(Text.of(String.format("Current game state: %s", Varoe.getInstance().getGameState().toString())), false);
+        ctx.getSource().sendFeedback(new LiteralText("Current game state: ")
+                .append(new LiteralText(String.format("%s", Varoe.getInstance().getGameState().toString()))
+                        .formatted(Formatting.BOLD, Formatting.YELLOW)), false);
 
         // get player save data for coords
         var playerManager = ctx.getSource().getServer().getPlayerManager();
-        var saveHandler = ((PlayerManagerAccessor)playerManager).getSaveHandler();
-        File playerDataDir = ((WorldSaveHandlerAccessor)saveHandler).getPlayerDataDir();
+        var saveHandler = ((PlayerManagerAccessor) playerManager).getSaveHandler();
+        File playerDataDir = ((WorldSaveHandlerAccessor) saveHandler).getPlayerDataDir();
 
         String[] savedPlayerIds = saveHandler.getSavedPlayerIds();
 
@@ -234,21 +238,42 @@ public class Commands {
         for (var player : varoe.getData().registeredPlayers.values()) {
             var joinTime = varoe.getData().joinTimes.get(player.getProfile());
 
-            String line = String.format(" %s", player.getProfile().getName());
+            LiteralText line = new LiteralText(String.format(" %s", player.getProfile().getName()));
 
             var scoreboard = ctx.getSource().getServer().getScoreboard();
             var team = scoreboard.getPlayerTeam(player.getProfile().getName());
             if (team != null)
-                line += String.format(" [%s]", team.getDisplayName().asString());
+                line
+                        .append(" [")
+                        .append(new LiteralText(String.format("%s", team.getDisplayName().asString()))
+                                .formatted(Formatting.GOLD)
+                        )
+                        .append("]");
 
-            line += String.format(": %s", player.isAlive() ? "alive" : "dead");
+            line.append(": ");
+            if (player.isAlive()) {
+                line
+                        .append(new LiteralText("alive")
+                                .formatted(Formatting.BOLD, Formatting.GREEN)
+                        );
+            } else {
+                line
+                        .append(new LiteralText("dead")
+                                .formatted(Formatting.BOLD, Formatting.RED)
+                        );
+            }
 
             // TODO check if player logged in
             if (joinTime != null) {
                 Duration timeLeft = varoe.getData().playTime.minus(Duration.between(joinTime, Instant.now()));
 
                 if (!timeLeft.isNegative())
-                    line += String.format(", %02d:%02d left", timeLeft.toMinutes(), timeLeft.toSecondsPart());
+                    line
+                            .append(", ")
+                            .append(new LiteralText(String.format("%02d:%02d", timeLeft.toMinutes(), timeLeft.toSecondsPart()))
+                                    .formatted(Formatting.LIGHT_PURPLE)
+                            )
+                            .append(" left");
             }
 
 //                if (timeLeft.isNegative())
@@ -260,9 +285,10 @@ public class Commands {
 //            }
 
             var onlinePlayer = playerManager.getPlayerList().stream().filter(e -> e.getGameProfile().equals(player.getProfile())).findAny();
+
+            Vec3d pos = null;
             if (onlinePlayer.isPresent()) {
-                var pos = onlinePlayer.get().getPos();
-                line += String.format(" (x: %.2f, y: %.2f, z: %.2f)", pos.x, pos.y, pos.z);
+                pos = onlinePlayer.get().getPos();
             } else {
                 if (Arrays.stream(savedPlayerIds).anyMatch(e -> e.equals(player.getProfile().getId().toString()))) {
                     // get coords from offline player
@@ -270,9 +296,8 @@ public class Commands {
                     if (file.isFile()) {
                         try {
                             var data = NbtIo.readCompressed(file);
-                            var pos = data.getList("Pos", NbtElement.DOUBLE_TYPE);
-
-                            line += String.format(" (x: %.2f, y: %.2f, z: %.2f)", pos.getDouble(0), pos.getDouble(1), pos.getDouble(2));
+                            var nbtPos = data.getList("Pos", NbtElement.DOUBLE_TYPE);
+                            pos = new Vec3d(nbtPos.getDouble(0), nbtPos.getDouble(1), nbtPos.getDouble(2));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -280,7 +305,21 @@ public class Commands {
                 }
             }
 
-            ctx.getSource().sendFeedback(Text.of(line), false);
+            assert pos != null;
+
+            line
+                    .append(" (")
+                    .append(new LiteralText("x: ").formatted(Formatting.GRAY))
+                    .append(new LiteralText(String.format("%.2f", pos.x)).formatted(Formatting.RED))
+                    .append(", ")
+                    .append(new LiteralText("y: ").formatted(Formatting.GRAY))
+                    .append(new LiteralText(String.format("%.2f", pos.y)).formatted(Formatting.GREEN))
+                    .append(", ")
+                    .append(new LiteralText("z: ").formatted(Formatting.GRAY))
+                    .append(new LiteralText(String.format("%.2f", pos.z)).formatted(Formatting.BLUE))
+                    .append(")");
+
+            ctx.getSource().sendFeedback(line, false);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -380,7 +419,7 @@ public class Commands {
             throw new SimpleCommandExceptionType(new TranslatableText("commands.team.add.duplicate")).create();
         else {
             var team = scoreboard.addTeam(teamName);
-            team.setPrefix(new LiteralText(String.format("[%s] ", teamName)));
+            team.setPrefix(new LiteralText("[").append(new LiteralText(String.format("%s", teamName)).formatted(Formatting.GOLD)).append("] "));
             ctx.getSource().sendFeedback(new TranslatableText("commands.team.add.success", team.getFormattedName()), true);
 
             return scoreboard.getTeams().size();
