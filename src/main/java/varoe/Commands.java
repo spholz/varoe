@@ -115,7 +115,9 @@ public class Commands {
                 .then(literal("status")
                         .executes(this::executeStatus)
                 )
-
+                .then(literal("teamchests")
+                        .executes(this::executeTeamChests)
+                )
                 .then(literal("allowjoin")
                         .then(argument("allow_joining", BoolArgumentType.bool())
                                 .executes(this::executeAllowJoin)
@@ -322,6 +324,13 @@ public class Commands {
             ctx.getSource().sendFeedback(line, false);
         }
 
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeTeamChests(CommandContext<ServerCommandSource> ctx) {
+        ctx.getSource().sendFeedback(Text.of("Team chests: " +
+                Arrays.toString(varoe.getTeamChests().entrySet().stream()
+                        .map(e -> e.getKey() + ": " + e.getValue().getName()).toArray())), false);
         return Command.SINGLE_SUCCESS;
     }
 
