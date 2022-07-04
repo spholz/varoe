@@ -40,15 +40,11 @@ import static net.minecraft.util.Util.NIL_UUID;
 
 public class Varoe {
     private static final Logger LOGGER = LoggerFactory.getLogger("varoe");
-
-    private Instant countdownEnd;
-
-    private VaroeData data;
-    private final Commands commands;
-
-    private MinecraftServer server;
-
     private static Varoe INSTANCE;
+    private final Commands commands;
+    private Instant countdownEnd;
+    private VaroeData data;
+    private MinecraftServer server;
 
     public Varoe() {
         INSTANCE = this;
@@ -279,7 +275,7 @@ public class Varoe {
 
             data.joinTimes.put(player.getGameProfile(), Instant.now());
 
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, (int)data.safeTime.toSeconds() * 20, 4, false, false));
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, (int) data.safeTime.toSeconds() * 20, 4, false, false));
 
             saveData();
         } else if (!server.getPlayerManager().isOperator(player.getGameProfile())) {
@@ -295,21 +291,20 @@ public class Varoe {
 
     public void saveData() {
 //        try {
-            File file = server.getSavePath(WorldSavePath.ROOT).resolve("varoe_data.json").toFile();
-            File backupFile = server.getSavePath(WorldSavePath.ROOT).resolve("varoe_data.json.bak").toFile();
+        File file = server.getSavePath(WorldSavePath.ROOT).resolve("varoe_data.json").toFile();
+        File backupFile = server.getSavePath(WorldSavePath.ROOT).resolve("varoe_data.json.bak").toFile();
 
-            if (file.exists()) {
-                if (backupFile.exists())
-                    assert backupFile.delete();
+        if (file.exists()) {
+            assert !backupFile.exists() || backupFile.delete();
 
-                assert file.renameTo(backupFile);
-            }
+            assert file.renameTo(backupFile);
+        }
 
-            try {
-                data.save(file);
-            } catch (IOException e) {
-                LOGGER.error("Failed to save \"{}\": {}", file.getAbsolutePath(), e.getMessage());
-            }
+        try {
+            data.save(file);
+        } catch (IOException e) {
+            LOGGER.error("Failed to save \"{}\": {}", file.getAbsolutePath(), e.getMessage());
+        }
 //        } catch (Exception e) {
 //            LOGGER.error("Unexpected exception caught while trying to save Varo data", e);
 //        }

@@ -33,9 +33,12 @@ import static net.minecraft.sound.SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
-    @Shadow @Final public MinecraftServer server;
+    @Shadow
+    @Final
+    public MinecraftServer server;
 
-    @Shadow public ServerPlayNetworkHandler networkHandler;
+    @Shadow
+    public ServerPlayNetworkHandler networkHandler;
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);

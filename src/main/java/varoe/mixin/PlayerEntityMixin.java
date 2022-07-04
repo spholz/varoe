@@ -16,7 +16,9 @@ import varoe.VaroeData;
 
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixin {
-    @Shadow @Final private GameProfile gameProfile;
+    @Shadow
+    @Final
+    private GameProfile gameProfile;
 
     @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isAttackable()Z"))
     private boolean isAttackable(Entity target) {

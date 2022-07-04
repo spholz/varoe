@@ -23,15 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class VaroeData {
-    public final Map<GameProfile, VaroPlayer> registeredPlayers;
-    public final Map<GameProfile, Instant> joinTimes;
-    public final Map<Vec3i, AbstractTeam> teamChests;
-    public final BannedItems bannedItems;
-    public Duration playTime = Duration.ofSeconds(15);
-    public Duration safeTime = Duration.ofSeconds(10);
-    public int maxOpponentDistance = 25;
-
-    transient private static final Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
             // Gson doesn't provide a TypeAdapter for java.time.Instant and java.time.Duration
             .registerTypeAdapter(Instant.class,
                     new TypeAdapter<Instant>() {
@@ -147,17 +139,13 @@ public class VaroeData {
             .setPrettyPrinting()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
-
-    public enum GameState {
-        // project not yet started
-        NOT_STARTED,
-        // joining is allowed in this state
-        JOINING_ALLOWED,
-        // varo is about to start
-        COUNTDOWN,
-        STARTED,
-    }
-
+    public final Map<GameProfile, VaroPlayer> registeredPlayers;
+    public final Map<GameProfile, Instant> joinTimes;
+    public final Map<Vec3i, AbstractTeam> teamChests;
+    public final BannedItems bannedItems;
+    public Duration playTime = Duration.ofSeconds(15);
+    public Duration safeTime = Duration.ofSeconds(10);
+    public int maxOpponentDistance = 25;
     public GameState state = GameState.NOT_STARTED;
 
     public VaroeData() {
@@ -165,6 +153,12 @@ public class VaroeData {
         joinTimes = new HashMap<>();
         teamChests = new HashMap<>();
         bannedItems = new BannedItems();
+    }
+
+    public static VaroeData load(File file) throws IOException {
+        final var reader = new BufferedReader(new FileReader(file));
+
+        return gson.fromJson(reader, VaroeData.class);
     }
 
     public void save(File file) throws IOException {
@@ -177,9 +171,13 @@ public class VaroeData {
         writer.close();
     }
 
-    public static VaroeData load(File file) throws IOException {
-        final var reader = new BufferedReader(new FileReader(file));
-
-        return gson.fromJson(reader, VaroeData.class);
+    public enum GameState {
+        // project not yet started
+        NOT_STARTED,
+        // joining is allowed in this state
+        JOINING_ALLOWED,
+        // varo is about to start
+        COUNTDOWN,
+        STARTED,
     }
 }
