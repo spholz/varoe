@@ -15,6 +15,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.ColorArgumentType;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
@@ -75,7 +76,9 @@ public class Commands {
                 .then(literal("team")
                                 .then(literal("add")
                                         .then(argument("team", StringArgumentType.word())
-                                                .executes(this::executeTeamAdd)
+                                                .then(argument("color", ColorArgumentType.color())
+                                                        .executes(this::executeTeamAdd)
+                                                )
                                         )
                                 )
 //                        .then(literal("remove")
@@ -424,13 +427,14 @@ public class Commands {
 
     private int executeTeamAdd(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         var teamName = StringArgumentType.getString(ctx, "team");
+        var color = ColorArgumentType.getColor(ctx, "color");
         var scoreboard = ctx.getSource().getServer().getScoreboard();
 
         if (scoreboard.getTeam(teamName) != null)
             throw new SimpleCommandExceptionType(new TranslatableText("commands.team.add.duplicate")).create();
         else {
             var team = scoreboard.addTeam(teamName);
-            team.setPrefix(new LiteralText("[").append(new LiteralText(String.format("%s", teamName)).formatted(Formatting.GOLD)).append("] "));
+            team.setPrefix(new LiteralText("[").append(new LiteralText(String.format("%s", teamName)).formatted(color)).append("] "));
             ctx.getSource().sendFeedback(new TranslatableText("commands.team.add.success", team.getFormattedName()), true);
 
             return scoreboard.getTeams().size();
