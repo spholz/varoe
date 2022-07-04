@@ -282,6 +282,14 @@ public class Varoe {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, (int)data.safeTime.toSeconds() * 20, 4, false, false));
 
             saveData();
+        } else if (!server.getPlayerManager().isOperator(player.getGameProfile())) {
+            String msg = String.format("WARNING: \"%s\" is neither registered nor an operator!!! (is the whitelist enabled?)", player.getName().asString());
+            LOGGER.warn(msg);
+
+            for (var p : server.getPlayerManager().getPlayerList()) {
+                if (server.getPlayerManager().isOperator(p.getGameProfile()))
+                    p.sendMessage(new LiteralText(msg).formatted(Formatting.RED), false);
+            }
         }
     }
 
