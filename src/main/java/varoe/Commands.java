@@ -307,19 +307,21 @@ public class Commands {
                 }
             }
 
-            assert pos != null;
-
-            line
-                    .append(" (")
-                    .append(new LiteralText("x: ").formatted(Formatting.GRAY))
-                    .append(new LiteralText(String.format("%.2f", pos.x)).formatted(Formatting.RED))
-                    .append(", ")
-                    .append(new LiteralText("y: ").formatted(Formatting.GRAY))
-                    .append(new LiteralText(String.format("%.2f", pos.y)).formatted(Formatting.GREEN))
-                    .append(", ")
-                    .append(new LiteralText("z: ").formatted(Formatting.GRAY))
-                    .append(new LiteralText(String.format("%.2f", pos.z)).formatted(Formatting.BLUE))
-                    .append(")");
+            if (pos != null) {
+                line
+                        .append(" (")
+                        .append(new LiteralText("x: ").formatted(Formatting.GRAY))
+                        .append(new LiteralText(String.format("%.2f", pos.x)).formatted(Formatting.RED))
+                        .append(", ")
+                        .append(new LiteralText("y: ").formatted(Formatting.GRAY))
+                        .append(new LiteralText(String.format("%.2f", pos.y)).formatted(Formatting.GREEN))
+                        .append(", ")
+                        .append(new LiteralText("z: ").formatted(Formatting.GRAY))
+                        .append(new LiteralText(String.format("%.2f", pos.z)).formatted(Formatting.BLUE))
+                        .append(")");
+            } else {
+                line.append(new LiteralText(" (not logged in yet)").formatted(Formatting.GOLD));
+            }
 
             ctx.getSource().sendFeedback(line, false);
         }
